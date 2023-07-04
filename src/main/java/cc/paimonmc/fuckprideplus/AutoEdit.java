@@ -37,7 +37,7 @@ public class AutoEdit extends Application {
             if (zipEntry.getName().endsWith(".class")){
                 try {
                     ClassNode classNode = new ClassNode();
-                    ClassReader reader = new ClassReader(zipFile.getInputStream(new ZipEntry(zipEntry)));
+                    ClassReader reader = new ClassReader(zipFile.getInputStream(zipEntry));
                     reader.accept(classNode,ClassReader.EXPAND_FRAMES);
                     classNodes.add(classNode);
                 } catch (IOException e) {
@@ -59,20 +59,20 @@ public class AutoEdit extends Application {
             zipFile.stream()
                     .filter(zipEntry -> !getClassName().contains(zipEntry.getName()))
                     .forEach(zipEntry -> {
-                try {
-                    zipOutputStream.putNextEntry(zipEntry);
-                    InputStream inputStream = zipFile.getInputStream(zipEntry);
-                    byte[] bytes = new byte[1024];
-                    int length;
-                    while ((length = inputStream.read(bytes)) != -1){
-                        zipOutputStream.write(bytes,0,length);
-                    }
-                    inputStream.close();
-                    zipOutputStream.closeEntry();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+                        try {
+                            zipOutputStream.putNextEntry(zipEntry);
+                            InputStream inputStream = zipFile.getInputStream(zipEntry);
+                            byte[] bytes = new byte[1024];
+                            int length;
+                            while ((length = inputStream.read(bytes)) != -1){
+                                zipOutputStream.write(bytes,0,length);
+                            }
+                            inputStream.close();
+                            zipOutputStream.closeEntry();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
         }
     }
     @Override
